@@ -74,6 +74,10 @@ function analyzeSalesData(data, options) {
     data.products.map((product) => [product.sku, product]),
   );
 
+  if(!data.purchase_records){
+    throw new Error("массив purchase_records пуст")
+  }
+
   data.purchase_records.forEach((record) => {
     const seller = sellerIndex[record.seller_id];
     seller.sales_count += 1;
@@ -82,7 +86,6 @@ function analyzeSalesData(data, options) {
     record.items.forEach((item) => {
       const product = productIndex[item.sku];
       const cost = product.purchase_price * item.quantity;
-
 
       const revenue = calculateRevenue(item, product);
       const profit = revenue - cost;
@@ -98,17 +101,20 @@ function analyzeSalesData(data, options) {
 
   sellerStats.forEach((seller, index) => {
     seller.bonus = calculateBonus(index, sellerStats.length, seller);
-    seller.top_products = Object.entries(seller.products_sold).map(product => ({sku: product[0], quantity: product[1]})).sort((a, b) => b.quantity - a.quantity).slice(0, 10);
+    seller.top_products = Object.entries(seller.products_sold)
+      .map((product) => ({ sku: product[0], quantity: product[1] }))
+      .sort((a, b) => b.quantity - a.quantity)
+      .slice(0, 10);
   });
 
   // @TODO: Подготовка итоговой коллекции с нужными полями
-  return sellerStats.map(seller => ({
+  return sellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
     revenue: +seller.revenue.toFixed(2),
     profit: +seller.profit.toFixed(2),
     sales_count: seller.sales_count,
     top_products: seller.top_products,
-    bonus: +seller.bonus.toFixed(2)
+    bonus: +seller.bonus.toFixed(2),
   }));
 }
