@@ -74,8 +74,8 @@ function analyzeSalesData(data, options) {
     data.products.map((product) => [product.sku, product]),
   );
 
-  if(!data.purchase_records){
-    throw new Error("массив purchase_records пуст")
+  if (!data.purchase_records) {
+    throw new Error("массив purchase_records пуст");
   }
 
   data.purchase_records.forEach((record) => {
@@ -93,7 +93,7 @@ function analyzeSalesData(data, options) {
       if (!seller.products_sold[item.sku]) {
         seller.products_sold[item.sku] = 0;
       }
-      seller.products_sold[item.sku] += 1;
+      seller.products_sold[item.sku] += item.quantity;
     });
   });
 
@@ -107,7 +107,6 @@ function analyzeSalesData(data, options) {
       .slice(0, 10);
   });
 
-  // @TODO: Подготовка итоговой коллекции с нужными полями
   return sellerStats.map((seller) => ({
     seller_id: seller.id,
     name: seller.name,
